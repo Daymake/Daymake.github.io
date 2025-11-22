@@ -165,10 +165,10 @@ const App: React.FC = () => {
 
         {/* Line 3: Badges / Shields Row */}
         <div className="flex flex-nowrap justify-center items-center gap-1 overflow-x-auto max-w-full px-2 scrollbar-hide">
-            <Badge leftText="Frame" rightText="H5" color="blue" icon={<H5Icon className="w-3 h-3 text-white" />} tooltip="本站框架为H5" />
+            <Badge leftText="Frame" rightText="H5" color="blue" icon={<H5Icon className="w-3 h-3 text-white animate-float" />} tooltip="本站框架为H5" />
             <Badge leftText="Hosted" rightText="Oracle" color="green" icon={<Server size={11} className="animate-server-flash text-white" />} href="https://www.oracle.com/" tooltip="本站採用多線部署，主站託管於甲骨文雲" />
             <Badge leftText="萌ICP备" rightText="2020520" color="pink" icon={<MengICPIcon className="w-3 h-3" />} tooltip="備案" />
-            <Badge leftText="Source" rightText="Github" color="purple" icon={<Github size={11} fill="currentColor" className="animate-wiggle text-white" />} href="https://github.com" tooltip="本站項目由Github託管" />
+            <Badge leftText="Source" rightText="Github" color="purple" icon={<Github size={11} fill="currentColor" className="animate-spin-slow text-white" />} href="https://github.com" tooltip="本站項目由Github託管" />
         </div>
 
         {/* Line 4: Copyright Text */}
@@ -203,4 +203,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-    

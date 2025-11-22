@@ -13,6 +13,7 @@
               'spin-slow': 'spin 3s linear infinite',
               'heartbeat': 'heartbeat 1.5s ease-in-out infinite',
               'server-flash': 'serverFlash 2s step-end infinite',
+              'float': 'float 3s ease-in-out infinite',
             },
             keyframes: {
               heartbeat: {
@@ -22,6 +23,10 @@
               serverFlash: {
                 '0%, 100%': { color: '#4CAE4F', filter: 'drop-shadow(0 0 1px #4CAE4F)' }, /* Green */
                 '50%': { color: '#F44336', filter: 'drop-shadow(0 0 1px #F44336)' }, /* Red */
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-3px)' },
               }
             }
           }
