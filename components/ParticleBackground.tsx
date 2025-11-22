@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 
 const ParticleBackground: React.FC = () => {
@@ -14,16 +15,18 @@ const ParticleBackground: React.FC = () => {
     canvas.width = width;
     canvas.height = height;
 
-    const particles: Array<{x: number, y: number, size: number, speedY: number, opacity: number}> = [];
-    const particleCount = 40;
+    // Love theme on Light Mode: Particles need to be darker (Slate/Rose) to be visible
+    const particles: Array<{x: number, y: number, size: number, speedY: number, speedX: number, opacity: number}> = [];
+    const particleCount = 60; 
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        size: Math.random() * 2,
-        speedY: Math.random() * 0.2 + 0.1,
-        opacity: Math.random() * 0.5 + 0.1
+        size: Math.random() * 2 + 0.5,
+        speedY: Math.random() * 0.3 + 0.1, 
+        speedX: Math.random() * 0.2 - 0.1, 
+        opacity: Math.random() * 0.5 + 0.2
       });
     }
 
@@ -31,16 +34,27 @@ const ParticleBackground: React.FC = () => {
       ctx.clearRect(0, 0, width, height);
       
       particles.forEach(p => {
-        ctx.fillStyle = `rgba(255, 255, 200, ${p.opacity})`; // Yellowish tint
+        // Slate-300 / Rose-300 mix
+        // Randomly assign color or mix
+        ctx.fillStyle = `rgba(244, 114, 182, ${p.opacity})`; // Rose
+        if (Math.random() > 0.5) {
+             ctx.fillStyle = `rgba(148, 163, 184, ${p.opacity})`; // Slate
+        }
+        
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
 
-        p.y -= p.speedY;
+        p.y -= p.speedY; // Move Upwards
+        p.x += p.speedX;
+
+        // Reset if goes off screen
         if (p.y < 0) {
           p.y = height;
           p.x = Math.random() * width;
         }
+        if (p.x > width) p.x = 0;
+        if (p.x < 0) p.x = width;
       });
 
       requestAnimationFrame(render);
@@ -62,7 +76,7 @@ const ParticleBackground: React.FC = () => {
   return (
     <canvas 
       ref={canvasRef} 
-      className="fixed top-0 left-0 w-full h-full pointer-events-none z-0"
+      className="fixed top-0 left-0 w-full h-full pointer-events-none z-0 opacity-50"
     />
   );
 };

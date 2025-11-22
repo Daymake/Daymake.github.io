@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { BadgeProps } from '../types';
@@ -9,7 +10,6 @@ const Badge: React.FC<BadgeProps> = ({ leftText, rightText, color, icon, href, t
   const timerRef = useRef<number | null>(null);
   const mousePosRef = useRef({ x: 0, y: 0 });
 
-  // Cleanup timer on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current !== null) {
@@ -18,17 +18,21 @@ const Badge: React.FC<BadgeProps> = ({ leftText, rightText, color, icon, href, t
     };
   }, []);
 
-  // Dynamic class logic for the right side background color
+  // Updated color palette: Vibrant colors to match the user's screenshot
   const getColorClass = (colorCode: string) => {
     switch(colorCode) {
-      case 'blue': return 'bg-[#007EC6]';
-      case 'green': return 'bg-[#4CAE4F]';
-      case 'sky': return 'bg-[#2D8AD5]';
-      case 'cyan': return 'bg-[#40A9FF]';
-      case 'pink': return 'bg-[#E91E63]';
-      case 'purple': return 'bg-[#9C27B0]';
-      case 'red': return 'bg-[#F44336]';
-      default: return 'bg-gray-600';
+      case 'blue': return 'bg-[#3b8eea]'; // Bright Blue
+      case 'green': return 'bg-[#42b983]'; // Vue Green / Bright Green
+      case 'sky': return 'bg-sky-500';
+      case 'cyan': return 'bg-cyan-500';
+      case 'pink': return 'bg-[#ff69b4]'; // Hot Pink
+      case 'purple': return 'bg-[#8e44ad]'; // Vibrant Purple
+      case 'red': return 'bg-[#e05d44]'; // Badge Red
+      case 'rose': return 'bg-rose-500'; 
+      case 'gray': return 'bg-slate-500';
+      case 'zinc': return 'bg-zinc-600';
+      case 'slate': return 'bg-slate-500'; 
+      default: return 'bg-slate-500';
     }
   };
 
@@ -61,30 +65,30 @@ const Badge: React.FC<BadgeProps> = ({ leftText, rightText, color, icon, href, t
   };
 
   const content = (
-    <div className="flex items-center shadow-sm cursor-default text-xs whitespace-nowrap">
-      {/* Left Side */}
-      <div className="flex items-center gap-1 bg-[#555555] text-white px-2 py-1 rounded-l-[4px] font-medium">
+    <div className="flex items-center shadow-sm cursor-default text-xs whitespace-nowrap rounded-[3px] overflow-hidden">
+      {/* Left Side - Dark Gray (Zinc-700) to match screenshot style */}
+      <div className="flex items-center gap-1 bg-[#555555] text-white px-1.5 py-[3px] font-medium">
         {icon && <span className="w-3 h-3 flex items-center justify-center">{icon}</span>}
         <span className="text-shadow-sm">{leftText}</span>
       </div>
-      {/* Right Side */}
-      <div className={`${getColorClass(color)} text-white px-2 py-1 rounded-r-[4px] font-medium`}>
+      {/* Right Side - Vibrant Color */}
+      <div className={`${getColorClass(color)} text-white px-1.5 py-[3px] font-medium`}>
         {rightText}
       </div>
     </div>
   );
 
   const containerProps = {
+    // Badges are colorful by default. No hover transformations.
     className: "inline-block relative select-none",
     onMouseEnter: handleMouseEnter,
     onMouseLeave: handleMouseLeave,
     onMouseMove: handleMouseMove
   };
 
-  // Render Tooltip in a Portal to avoid transform stacking context issues
   const TooltipNode = tooltip && isVisible ? (
     <div 
-      className="fixed z-[9999] px-2 py-1.5 bg-[#1a1a1a]/95 border border-[#333] text-gray-200 text-[11px] rounded-sm shadow-[0_4px_20px_rgba(0,0,0,0.5)] backdrop-blur-sm pointer-events-none whitespace-nowrap tracking-wide"
+      className="fixed z-[9999] px-2 py-1.5 bg-white border border-slate-200 text-slate-600 text-[11px] rounded-sm shadow-lg backdrop-blur-sm pointer-events-none whitespace-nowrap tracking-wide"
       style={{ 
         top: popupPos.y + 12, 
         left: popupPos.x + 12,

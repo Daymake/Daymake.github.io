@@ -11,6 +11,18 @@
           extend: {
             animation: {
               'spin-slow': 'spin 3s linear infinite',
+              'heartbeat': 'heartbeat 1.5s ease-in-out infinite',
+              'server-flash': 'serverFlash 2s step-end infinite',
+            },
+            keyframes: {
+              heartbeat: {
+                '0%, 100%': { transform: 'scale(1)' },
+                '50%': { transform: 'scale(1.15)' },
+              },
+              serverFlash: {
+                '0%, 100%': { color: '#4CAE4F', filter: 'drop-shadow(0 0 1px #4CAE4F)' }, /* Green */
+                '50%': { color: '#F44336', filter: 'drop-shadow(0 0 1px #F44336)' }, /* Red */
+              }
             }
           }
         }
@@ -26,7 +38,7 @@
       }
     </style>
   </head>
-  <body class="bg-[#0d0d0f]">
+  <body class="bg-slate-50">
     <div id="root"></div>
     <script type="importmap">
     {
