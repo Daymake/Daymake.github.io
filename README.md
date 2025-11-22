@@ -11,7 +11,7 @@ View your app in AI Studio: https://ai.studio/apps/drive/1TUEJZkinbRviUOD1jgCKOs
 ## Run Locally
 
 **Prerequisites:**  Node.js
-
+https://daymake.github.io/
 
 1. Install dependencies:
    `npm install`
