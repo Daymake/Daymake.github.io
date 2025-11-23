@@ -1,0 +1,169 @@
+/**
+ * css/style.css
+ * 全站通用样式：
+ * - 全局字体 / 布局
+ * - 动画（心跳 / 旋转 / 悬浮 / 闪烁 / 渐入 / 光标）
+ * - 玻璃拟态卡片 / 头部
+ * - Tooltip / 自定义滚动条
+ */
+
+/* =============== 全局 =============== */
+body {
+    font-family: "Noto Sans SC", sans-serif;
+    background-color: #f8fafc;
+    color: #475569;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 让 main 区域整体下移，避免被悬浮导航遮挡 */
+main {
+    flex-grow: 1;
+    padding-top: 160px !important;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.8);
+}
+
+/* 可选：完全隐藏滚动条时使用 */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* =============== 动画 =============== */
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+.animate-heartbeat { animation: heartbeat 1.5s ease-in-out infinite; }
+
+@keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.animate-spin-slow { animation: spin-slow 3s linear infinite; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+.animate-float { animation: float 3s ease-in-out infinite; }
+
+@keyframes serverFlash {
+    0%, 100% { color: #4CAE4F; filter: drop-shadow(0 0 1px #4CAE4F); }
+    50% { color: #F44336; filter: drop-shadow(0 0 1px #F44336); }
+}
+.animate-server-flash { animation: serverFlash 2s step-end infinite; }
+
+/* Frame 图标：旋转 + 白/黄闪烁（整图颜色在白色和黄色之间交换） */
+@keyframes frameSpinFlash {
+    0% {
+        transform: rotate(0deg);
+        color: #ffffff; /* 白色 */
+    }
+    50% {
+        transform: rotate(180deg);
+        color: #facc15; /* 黄 (tailwind yellow-400) */
+    }
+    100% {
+        transform: rotate(360deg);
+        color: #ffffff; /* 回到白色 */
+    }
+}
+.animate-frame-spin-flash {
+    animation: frameSpinFlash 2.5s linear infinite;
+}
+
+/* Source 图标：放大 + 闪烁（白色高光） */
+@keyframes sourcePulseFlash {
+    0% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 0px rgba(248, 250, 252, 0));
+        opacity: 0.9;
+    }
+    50% {
+        transform: scale(1.15);
+        filter: drop-shadow(0 0 4px rgba(248, 250, 252, 1)); /* 白光 */
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 0px rgba(248, 250, 252, 0));
+        opacity: 0.9;
+    }
+}
+.animate-source-pulse-flash {
+    animation: sourcePulseFlash 1.8s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+/* =============== 组件 =============== */
+
+/* 玻璃拟态卡片 */
+.glass-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+                0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* 玻璃拟态头部（目前 Header 使用 Tailwind 类，预留此类备选） */
+.glass-header {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+}
+
+/* 一言使用衬线字体 */
+.font-quote {
+    font-family: "Noto Serif SC", serif;
+}
+
+/* 打字机光标 */
+.cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background-color: #fb7185; /* rose-400 */
+    vertical-align: middle;
+    animation: blink 1s step-end infinite;
+}
+
+/* Tooltip 样式 */
+.tooltip {
+    position: fixed;
+    z-index: 9999;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #334155;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.tooltip.visible {
+    opacity: 1;
+}
