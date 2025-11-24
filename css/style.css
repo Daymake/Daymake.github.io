@@ -39,83 +39,108 @@ main {
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* =============== 动画 =============== */
+
+/* ======================================= */
+/* 核心修改：禁止图片拖拽与选中 (解决鼠标变蓝问题) */
+/* ======================================= */
+img {
+    /* 禁止拖拽图片 */
+    -webkit-user-drag: none;
+    user-drag: none;
+    /* 禁止选中图片变蓝 */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* 禁止长按弹出菜单 (移动端) */
+    -webkit-touch-callout: none;
+}
+
+
+/* =============== 通用动画 Keyframes =============== */
+
+/* 爱心跳动 / Logo跳动 */
 @keyframes heartbeat {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.15); }
 }
 .animate-heartbeat { animation: heartbeat 1.5s ease-in-out infinite; }
 
+/* 页脚版权 ♥：放大 + 闪烁 */
+@keyframes heartFlash {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.25);
+        opacity: 1;
+    }
+}
+.animate-heart-flash {
+    animation: heartFlash 1.1s ease-in-out infinite;
+}
+
+/* 慢速旋转 (用于无限旋转，例如加载图标) */
 @keyframes spin-slow {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
 .animate-spin-slow { animation: spin-slow 3s linear infinite; }
 
+
+/* 新增：通用图片单次旋转动画 Keyframe (用于 gy.png 或其他图片) */
+@keyframes rotate-360-once {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+
+/* 上下悬浮 */
 @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-3px); }
 }
 .animate-float { animation: float 3s ease-in-out infinite; }
 
-@keyframes serverFlash {
-    0%, 100% { color: #4CAE4F; filter: drop-shadow(0 0 1px #4CAE4F); }
-    50% { color: #F44336; filter: drop-shadow(0 0 1px #F44336); }
-}
-.animate-server-flash { animation: serverFlash 2s step-end infinite; }
-
-/* Frame 图标：旋转 + 白/黄闪烁（整图颜色在白色和黄色之间交换） */
-@keyframes frameSpinFlash {
-    0% {
-        transform: rotate(0deg);
-        color: #ffffff; /* 白色 */
-    }
-    50% {
-        transform: rotate(180deg);
-        color: #facc15; /* 黄 (tailwind yellow-400) */
-    }
-    100% {
-        transform: rotate(360deg);
-        color: #ffffff; /* 回到白色 */
-    }
-}
-.animate-frame-spin-flash {
-    animation: frameSpinFlash 2.5s linear infinite;
-}
-
-/* Source 图标：放大 + 闪烁（白色高光） */
-@keyframes sourcePulseFlash {
-    0% {
-        transform: scale(1);
-        filter: drop-shadow(0 0 0px rgba(248, 250, 252, 0));
-        opacity: 0.9;
-    }
-    50% {
-        transform: scale(1.15);
-        filter: drop-shadow(0 0 4px rgba(248, 250, 252, 1)); /* 白光 */
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1);
-        filter: drop-shadow(0 0 0px rgba(248, 250, 252, 0));
-        opacity: 0.9;
-    }
-}
-.animate-source-pulse-flash {
-    animation: sourcePulseFlash 1.8s ease-in-out infinite;
-}
-
+/* 渐入效果 */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
 
+/* 光标闪烁 */
 @keyframes blink {
     50% { opacity: 0; }
 }
 
-/* =============== 组件 =============== */
+
+/* =============== 底部徽章专用动画 (新) =============== */
+
+/* Frame (Code) 专用：白/蓝 闪烁 */
+@keyframes codeFlash {
+    0%, 100% { color: #ffffff; filter: drop-shadow(0 0 1px #ffffff); }
+    50% { color: #3b8eea; filter: drop-shadow(0 0 1px #3b8eea); }
+}
+.animate-code-flash { animation: codeFlash 2s step-end infinite; }
+
+/* Hosted (Server) 专用：白/红 闪烁 */
+@keyframes serverRedFlash {
+    0%, 100% { color: #ffffff; filter: drop-shadow(0 0 1px #ffffff); }
+    50% { color: #F44336; filter: drop-shadow(0 0 1px #F44336); }
+}
+.animate-server-red-flash { animation: serverRedFlash 2s step-end infinite; }
+
+/* Source (Src) 专用：白/紫 闪烁 */
+@keyframes srcFlash {
+    0%, 100% { color: #ffffff; filter: drop-shadow(0 0 1px #ffffff); }
+    50% { color: #8e44ad; filter: drop-shadow(0 0 1px #8e44ad); }
+}
+.animate-src-flash { animation: srcFlash 2s step-end infinite; }
+
+
+/* =============== 组件样式 =============== */
 
 /* 玻璃拟态卡片 */
 .glass-card {
@@ -127,7 +152,7 @@ main {
                 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 }
 
-/* 玻璃拟态头部（目前 Header 使用 Tailwind 类，预留此类备选） */
+/* 玻璃拟态头部 */
 .glass-header {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(12px);
@@ -166,4 +191,27 @@ main {
 }
 .tooltip.visible {
     opacity: 1;
+}
+
+/* ======================================= */
+/* 4. 交互类 (新) */
+/* ======================================= */
+
+/* header 链接点击效果 */
+header a:active { 
+    transform: scale(0.95); 
+    transition: transform 0.1s; 
+}
+
+/* 图片容器单次旋转：应用到包含 img 元素的父容器上 */
+/* 例如：<div class="image-spin-once-on-hover"><img src="gy.png"></div> */
+.image-spin-once-on-hover:hover img {
+    /* 使用我们定义的单次旋转 Keyframe */
+    animation: rotate-360-once 0.6s ease-out 1; 
+}
+
+/* 鼠标悬停无限旋转：应用到需要持续旋转的图标上 */
+.hover-spin:hover {
+    /* 使用我们定义的无限旋转 Keyframe */
+    animation: spin-slow 3s linear infinite;
 }
