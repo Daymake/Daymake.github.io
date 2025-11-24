@@ -2,11 +2,9 @@
  * js/main.js
  * 核心逻辑：
  * 1. 统一渲染 Header / Footer
- * 2. 粒子背景 / 时间循环 / 一言
- * 3. 营业状态：
- *    - 时间：周一至周五 08:00-18:00 营业
- *    - 视觉：营业(绿字+图片Logo) / 打烊(红字+骷髅SVG)
- * 4. Footer：红心调整为 text-base (16px) 精致大小
+ * 2. 交互优化：全站禁止右键，图片禁止拖拽
+ * 3. 营业状态：绿字/红字 + Logo切换
+ * 4. 修复：强制启动时间循环，解决子页面页脚卡死问题
  */
 
 const App = {
@@ -20,11 +18,23 @@ const App = {
         App.initMobileMenu();
         App.initTooltips();
         App.initBackToTop();
+        
+        //禁用图片拖拽
+document.addEventListener('dragstart', event => {
+    if (event.target.tagName === 'IMG') {
+        event.preventDefault();
+    }
+});
+        // 3. 核心修复：无条件启动时间循环
+        // 因为所有页面都有页脚，所以必须启动，否则页脚状态会卡在 Loading
+        App.startTimeLoop(); 
 
-        // 3. 启动核心循环
-        if (document.getElementById('clock-time')) App.startTimeLoop(); 
+        // 4. 页面特定逻辑检测
         if (document.getElementById('quote-text')) App.initHome();
         if (document.getElementById('about-typewriter')) App.initAbout();
+
+        // 🛡️ 安全防御：全站禁止右键菜单
+        document.addEventListener('contextmenu', event => event.preventDefault());
     },
 
     getRelativePrefix: () => {
@@ -38,13 +48,12 @@ const App = {
         if (document.querySelector('header')) return; 
 
         const p = App.getRelativePrefix();
-        const logoFallback = `this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjQzZjVlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTEyIDJMMiA3bDEwIDUgMTAtNS0xMC01ek0yIDE3bDEwIDUgMTAtNU0yIDEybDEwIDUgMTAtNSIvPjwvc3ZnPg=='`;
 
         const headerHTML = `
-            <header class="fixed top-4 z-50 w-[90%] max-w-6xl left-1/2 -translate-x-1/2 h-12 rounded-full flex items-center justify-between px-6 shadow-lg border border-white/60 bg-white/80 backdrop-blur-xl transition-all duration-300">
+            <header class="fixed top-4 z-50 w-[90%] max-w-6xl left-1/2 -translate-x-1/2 h-12 rounded-full flex items-center justify-between px-6 shadow-lg border border-white/60 bg-white/80 backdrop-blur-xl transition-all duration-300 select-none">
                 <a href="${p}index.html" class="flex items-center gap-2 group cursor-pointer no-underline flex-shrink-0">
                     <div class="relative h-10 w-auto min-w-[2.5rem] flex items-center flex-shrink-0">
-                         <img src="${p}img/Logo.PNG" alt="" class="h-full w-auto object-contain max-w-none group-hover:animate-heartbeat" onerror="${logoFallback}">
+                         <img src="${p}img/logo.png" alt="Logo" draggable="false" class="h-full w-auto object-contain max-w-none group-hover:animate-heartbeat">
                     </div>
                     <span class="text-slate-700 font-bold tracking-wider text-sm group-hover:text-rose-500 transition-colors duration-300">捌玖</span>
                 </a>
@@ -115,11 +124,11 @@ const App = {
         const p = App.getRelativePrefix();
 
         const footerHTML = `
-            <footer class="relative z-10 flex flex-col items-center gap-3 pb-4 mt-auto pt-4 w-full">
+            <footer class="relative z-10 flex flex-col items-center gap-3 pb-4 mt-auto pt-4 w-full select-none">
                 <div class="flex items-center gap-1.5 text-sm select-none group">
                     <div class="flex items-center gap-2 bg-[#e5e7eb] text-slate-700 px-3 py-1.5 rounded-[6px] shadow-sm border border-slate-300/60">
                         <div id="footer-logo-box" class="w-4 h-4 flex items-center justify-center">
-                             <img src="${p}img/Logo.PNG" alt="" class="w-full h-full object-contain animate-heartbeat">
+                             <img src="${p}img/logo.png" alt="" draggable="false" class="w-full h-full object-contain animate-heartbeat">
                         </div>
                         <span class="font-bold text-slate-800">捌玖</span>
                     </div>
@@ -140,15 +149,14 @@ const App = {
                 </div>
 
                 <div class="flex flex-wrap justify-center gap-1 px-4">
-                    ${App.createBadge('Frame', 'Web', 'blue', 'web')}
+                    ${App.createBadge('Frame', 'H5', 'blue', 'code')}
                     ${App.createBadge('Hosted', 'Oracle', 'green', 'server', 'https://www.oracle.com')}
-                    ${App.createBadge('萌ICP备', '2020520', 'pink', 'shield')}
-                    ${App.createBadge('Source', 'Github', 'purple', 'github', 'https://github.com')}
+                    ${App.createBadge('萌ICP备', '2020520', 'pink', 'icp')}
+                    ${App.createBadge('Source', 'Github', 'purple', 'src', 'https://github.com')}
                 </div>
 
                 <div class="flex items-center justify-center gap-2 text-sm text-slate-400 font-light mt-1">
                     <span>Copyright &copy; 2023 - ${year}</span>
-                    <!-- ⚠️ 红心：text-base (16px) -->
                     <span class="text-red-500 text-base animate-heart-flash">♥</span>
                     <span class="font-medium text-slate-500">捌玖 All Rights Reserved.</span>
                 </div>
@@ -160,17 +168,24 @@ const App = {
     createBadge: (left, right, color, iconType, href = null) => {
         const colors = { blue: 'bg-[#3b8eea]', green: 'bg-[#42b983]', pink: 'bg-[#ff69b4]', purple: 'bg-[#8e44ad]', red: 'bg-[#e05d44]' };
         const bgClass = colors[color] || 'bg-slate-500';
+        
         const icons = {
-            web: `<path d="M762.368 127.488H331.264C264.192 127.488 209.92 181.76 209.92 248.832V768c0 16.384 3.072 32.256 9.216 46.592 23.04 54.784 91.648 87.04 148.48 70.144l120.832-37.888c39.424-11.776 80.896-11.776 119.808 0.512l122.368 36.864c72.704 22.016 148.992-33.792 153.088-109.568V248.832c0-67.072-54.272-121.344-121.344-121.344z m-1.024 699.392c-12.288 1.536-35.328-5.632-47.104-8.704l-102.912-30.72c-41.984-14.848-88.064-14.848-130.048 0l-95.232 28.672c-28.16 8.192-71.168 10.24-94.72-7.168-22.528-16.384-24.576-48.64-24.576-79.872V455.168h0.512V287.744c0-54.272 44.032-98.304 98.304-98.304h362.496c54.272 0 98.304 44.032 98.304 98.304v175.104l0.512 12.288v253.952c0 71.168-20.48 91.648-65.536 97.792z" fill="#295082"/><path d="M483.328 593.408L398.848 507.904l72.192-71.68-29.696-43.008-115.2 114.688 36.352 36.352 78.336 78.848zM570.88 419.84l-0.512 176.64-51.2-9.216 0.512-177.152z" fill="#FECD2B"/><path d="M473.6 472.064l156.16-14.848-7.68 51.2-156.16 14.848zM598.528 596.48l-79.36 9.728v-46.592l94.208-14.336z" fill="#FECD2B"/><path d="M611.84 422.912L696.32 508.416l-72.192 71.68 29.696 43.008 115.2-114.688-36.352-36.352-78.336-78.848z" fill="#FECD2B"/>`,
+            code: `<path d="M512 70.62069h335.536552C847.501241 70.62069 847.448276 953.344 847.448276 953.344L176.498759 953.37931C176.569379 953.37931 176.551724 512 176.551724 512l-0.052965-226.392276L344.275862 70.62069H512zM298.743172 13.629793l-185.37931 238.344828A35.310345 35.310345 0 0 0 105.931034 273.655172V953.255724A70.656 70.656 0 0 0 176.498759 1024h671.002482A70.638345 70.638345 0 0 0 918.068966 953.344V70.656A70.550069 70.550069 0 0 0 847.536552 0H326.62069a35.310345 35.310345 0 0 0-27.877518 13.629793zM317.793103 247.313655C317.793103 247.207724 176.498759 247.172414 176.498759 247.172414v70.620689H317.793103c38.982621 0 70.62069-31.532138 70.62069-70.479448V70.62069h-70.62069v176.692965z m137.286621 492.402759a35.310345 35.310345 0 0 0 69.08469 14.689103l62.411034-293.570207a35.310345 35.310345 0 0 0-69.084689-14.689103l-62.411035 293.570207z m276.462345-117.142069a26.182621 26.182621 0 0 1 0-37.040552l-103.282759 103.265104a35.310345 35.310345 0 0 0 49.964138 49.928827l103.247449-103.247448a44.438069 44.438069 0 0 0 0-62.852414l-103.265104-103.247448a35.310345 35.310345 0 0 0-49.928827 49.928827l103.265103 103.282759z m-471.357793-49.928828a44.438069 44.438069 0 0 0 0 62.834759l103.265103 103.247448a35.310345 35.310345 0 0 0 49.928828-49.928827l-103.265104-103.265104c10.24 10.24 10.24 26.800552 0 37.040552l103.282759-103.265104a35.310345 35.310345 0 0 0-49.964138-49.928827l-103.247448 103.265103z"/>`,
             server: '<rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>',
-            shield: `<path d="M525.277867 4.983467c42.8032 36.522667 187.050667 144.1792 410.0096 150.391466 11.264 0.4096 20.411733 9.557333 20.411733 20.957867V605.525333C955.6992 797.627733 669.934933 1024 511.965867 1024 349.4912 1024 68.232533 797.627733 68.232533 605.525333V176.3328c0-11.605333 9.147733-20.6848 20.411734-20.957867C311.671467 149.230933 455.918933 41.642667 498.653867 4.983467a20.2752 20.2752 0 0 1 26.624 0z" fill="#FFF2F2"/><path d="M525.277867 4.983467c42.8032 36.522667 187.050667 144.1792 410.0096 150.391466 11.264 0.4096 20.411733 9.557333 20.411733 20.957867V605.525333C955.6992 797.627733 669.934933 1024 511.965867 1024 349.4912 1024 68.232533 797.627733 68.232533 605.525333V176.3328c0-11.605333 9.147733-20.6848 20.411734-20.957867C311.671467 149.230933 455.918933 41.642667 498.653867 4.983467a20.2752 20.2752 0 0 1 26.624 0zM511.965867 88.064l-10.922667 8.123733c-92.023467 65.536-212.3776 115.9168-358.126933 129.160534l-0.682667 380.1088c0 134.280533 220.637867 334.165333 358.4 344.8832l11.332267 0.477866c133.7344 0 369.800533-208.6912 369.800533-345.429333V225.4848h-0.887467c-145.408-13.175467-265.079467-63.214933-357.512533-128.955733L511.965867 88.132267z" fill="#FF7E7E"/><path d="M340.2752 315.5968l96.8704-14.609067a19.387733 19.387733 0 0 0 14.404267-10.8544l43.349333-90.999466a18.8416 18.8416 0 0 1 34.338133 0l43.349334 90.999466c2.730667 5.802667 8.192 9.898667 14.404266 10.922667l96.938667 14.5408c15.701333 2.321067 21.845333 22.3232 10.581333 33.792L624.401067 420.181333a20.206933 20.206933 0 0 0-5.461334 17.544534l16.5888 100.010666c2.730667 16.1792-13.653333 28.535467-27.784533 20.8896l-86.6304-47.172266a18.158933 18.158933 0 0 0-17.749333 0l-86.8352 47.104c-14.062933 7.714133-30.378667-4.642133-27.784534-20.821334l16.5888-100.010666a20.206933 20.206933 0 0 0-5.461333-17.544534L329.8304 349.3888c-11.4688-11.4688-5.12-31.470933 10.4448-33.792z m362.496 416.426667a18.978133 18.978133 0 0 1-18.6368 19.319466H339.797333a18.978133 18.978133 0 0 1-18.705066-19.387733v-48.264533c0-10.717867 8.328533-19.387733 18.705066-19.387734h344.337067c10.376533 0 18.705067 8.669867 18.705067 19.387734v48.264533z" fill="#FF4545"/>`,
-            github: '<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>'
+            icp: `<path d="M525.277867 4.983467c42.8032 36.522667 187.050667 144.1792 410.0096 150.391466 11.264 0.4096 20.411733 9.557333 20.411733 20.957867V605.525333C955.6992 797.627733 669.934933 1024 511.965867 1024 349.4912 1024 68.232533 797.627733 68.232533 605.525333V176.3328c0-11.605333 9.147733-20.6848 20.411734-20.957867C311.671467 149.230933 455.918933 41.642667 498.653867 4.983467a20.2752 20.2752 0 0 1 26.624 0z" fill="#FFF2F2"/><path d="M525.277867 4.983467c42.8032 36.522667 187.050667 144.1792 410.0096 150.391466 11.264 0.4096 20.411733 9.557333 20.411733 20.957867V605.525333C955.6992 797.627733 669.934933 1024 511.965867 1024 349.4912 1024 68.232533 797.627733 68.232533 605.525333V176.3328c0-11.605333 9.147733-20.6848 20.411734-20.957867C311.671467 149.230933 455.918933 41.642667 498.653867 4.983467a20.2752 20.2752 0 0 1 26.624 0zM511.965867 88.064l-10.922667 8.123733c-92.023467 65.536-212.3776 115.9168-358.126933 129.160534l-0.682667 380.1088c0 134.280533 220.637867 334.165333 358.4 344.8832l11.332267 0.477866c133.7344 0 369.800533-208.6912 369.800533-345.429333V225.4848h-0.887467c-145.408-13.175467-265.079467-63.214933-357.512533-128.955733L511.965867 88.132267z" fill="#FF7E7E"/><path d="M340.2752 315.5968l96.8704-14.609067a19.387733 19.387733 0 0 0 14.404267-10.8544l43.349333-90.999466a18.8416 18.8416 0 0 1 34.338133 0l43.349334 90.999466c2.730667 5.802667 8.192 9.898667 14.404266 10.922667l96.938667 14.5408c15.701333 2.321067 21.845333 22.3232 10.581333 33.792L624.401067 420.181333a20.206933 20.206933 0 0 0-5.461334 17.544534l16.5888 100.010666c2.730667 16.1792-13.653333 28.535467-27.784533 20.8896l-86.6304-47.172266a18.158933 18.158933 0 0 0-17.749333 0l-86.8352 47.104c-14.062933 7.714133-30.378667-4.642133-27.784534-20.821334l16.5888-100.010666a20.206933 20.206933 0 0 0-5.461333-17.544534L329.8304 349.3888c-11.4688-11.4688-5.12-31.470933 10.4448-33.792z m362.496 416.426667a18.978133 18.978133 0 0 1-18.6368 19.319466H339.797333a18.978133 18.978133 0 0 1-18.705066-19.387733v-48.264533c0-10.717867 8.328533-19.387733 18.705066-19.387734h344.337067c10.376533 0 18.705067 8.669867 18.705067 19.387734v48.264533z" fill="#FF4545"/>`,
+            src: '<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>'
         };
+        
         const hasIcon = !!icons[iconType];
         let iconClass = 'w-3 h-3 text-white';
-        if (iconType === 'web' || iconType === 'server' || iconType === 'github') { iconClass += ' animate-server-flash'; }
+        
+        if (iconType === 'code') iconClass += ' animate-code-flash';
+        else if (iconType === 'server') iconClass += ' animate-server-red-flash';
+        else if (iconType === 'src') iconClass += ' animate-src-flash';
+
         let viewBox = '0 0 24 24', strokeWidth = '2', stroke = 'currentColor', fill = 'none';
-        if (iconType === 'web' || iconType === 'shield') { viewBox = '0 0 1024 1024'; strokeWidth = '0'; stroke = 'none'; fill = 'currentColor'; }
+        if (iconType === 'code' || iconType === 'icp') { viewBox = '0 0 1024 1024'; strokeWidth = '0'; stroke = 'none'; fill = 'currentColor'; }
+        
         const iconSvg = hasIcon ? `<svg viewBox="${viewBox}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="${iconClass}">${icons[iconType]}</svg>` : '';
         const content = `<div class="flex items-center shadow-sm text-[10px] rounded-[3px] overflow-hidden cursor-default select-none hover:opacity-90 transition-opacity"><div class="flex items-center gap-1 bg-[#555555] text-white px-1.5 py-[2px] font-medium">${iconSvg}<span>${left}</span></div><div class="${bgClass} text-white px-1.5 py-[2px] font-medium">${right}</div></div>`;
         if (href) return `<a href="${href}" target="_blank">${content}</a>`;
@@ -308,8 +323,6 @@ const App = {
             // 更新文字和颜色
             if (businessStatusText) {
                 businessStatusText.textContent = isOpen ? '营业中' : '打烊了';
-                
-                // 颜色切换：绿/红
                 businessStatusText.classList.remove('text-slate-800', 'text-red-500', 'text-green-500');
                 if (isOpen) {
                     businessStatusText.classList.add('text-green-500');
@@ -329,10 +342,8 @@ const App = {
                 const isSvg = footerLogoBox.querySelector('svg');
 
                 if (isOpen && !isImg) {
-                    // 营业显示图片
-                    footerLogoBox.innerHTML = `<img src="${p}img/Logo.PNG" alt="" class="w-full h-full object-contain animate-heartbeat">`;
+                    footerLogoBox.innerHTML = `<img src="${p}img/logo.png" alt="" draggable="false" class="w-full h-full object-contain animate-heartbeat">`;
                 } else if (!isOpen && !isSvg) {
-                    // 打烊显示 SVG
                     footerLogoBox.innerHTML = `
                         <svg class="w-4 h-4 animate-heartbeat" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
                             <path d="M972.8 230.4C896 115.2 780.8 64 704 108.8c-6.4 6.4-12.8 6.4-19.2 12.8C640 89.6 582.4 64 524.8 64c-70.4 0-128 25.6-179.2 64-6.4-6.4-19.2-12.8-25.6-19.2C243.2 64 128 115.2 51.2 230.4-19.2 345.6-19.2 473.6 51.2 524.8c25.6 12.8 51.2 19.2 83.2 12.8-6.4 57.6-12.8 108.8-12.8 153.6 0 224 172.8 262.4 345.6 262.4v-192c-38.4-19.2-70.4-64-70.4-102.4C396.8 601.6 448 576 512 576s115.2 25.6 115.2 83.2c0 38.4-25.6 83.2-70.4 102.4V960c185.6 0 364.8-32 364.8-262.4 0-44.8-6.4-96-12.8-153.6 19.2 0 44.8-6.4 57.6-19.2 76.8-44.8 76.8-179.2 6.4-294.4zM403.2 492.8c-32 0-51.2-25.6-51.2-51.2 0-32 25.6-57.6 51.2-57.6 32 0 51.2 25.6 51.2 51.2 0 32-19.2 57.6-51.2 57.6z m217.6 0c-32 0-51.2-25.6-51.2-51.2 0-32 19.2-57.6 51.2-57.6s51.2 25.6 51.2 51.2c0 32-25.6 57.6-51.2 57.6z" fill="#040000"></path>
