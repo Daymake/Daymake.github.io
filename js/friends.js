@@ -1,225 +1,83 @@
 /**
  * js/friends.js
- * 友链数据与渲染逻辑
- * 独立管理以方便维护
- * 
+ * 友链数据管理：仅负责维护数据源，渲染与交互逻辑已迁移至 js/main.js
+ *
  * ==============================
- * 进阶版范本 (Advanced Example)
- * 方便后续管理，增加网址时参考：
+ * 数据结构参考 (Advanced Example)
  * ==============================
- * { 
- *   title: "示例网站", 
- *   desc: "网站描述", 
- *   url: "https://example.com",
- *   // [可选] 自定义图标 URL (不填则自动获取 Favicon)
- *   icon: "https://example.com/logo.png", 
- *   // [可选] 自定义图标背景色 (Tailwind 类名，默认 bg-slate-50)
- *   icon_bg: "bg-blue-100",
- *   // [可选] 自定义卡片背景色 (Tailwind 类名，默认白色)
- *   color: "bg-yellow-50 border-yellow-200"
+ * {
+ *   id: "分类唯一ID",
+ *   name: "分类名称",
+ *   icon: "<svg/path>",
+ *   items: [
+ *     {
+ *       title: "站点标题",
+ *       desc: "简短描述",
+ *       url: "https://example.com",
+ *       icon: "https://example.com/logo.png", // 可选
+ *       icon_bg: "bg-blue-100",             // 可选，自定义图标背景色
+ *       color: "bg-yellow-50 border-yellow-200" // 可选，自定义卡片背景
+ *     }
+ *   ]
  * }
  */
 
-const Friends = {
-    // 友链数据
-    data: [
-        {
-            id: 'tools', name: '常用工具', icon: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
-            items: [
-                { title: "语雀", desc: "专业的云端知识库", url: "https://www.yuque.com" },
-                { title: "QQ邮箱", desc: "腾讯QQ邮箱服务", url: "https://mail.qq.com" },
-                { title: "GitHub", desc: "代码托管平台", url: "https://github.com" },
-                { title: "在线PS", desc: "网页版PhotoShop", url: "https://ps.gaoding.com" },
-                { title: "Bilibili", desc: "干杯~", url: "https://www.bilibili.com", icon_bg: "bg-pink-100" },
-                { title: "知乎", desc: "有问题就会有答案", url: "https://www.zhihu.com" },
-                { title: "开源中国", desc: "技术交流社区", url: "https://www.oschina.net" },
-                { title: "房贷计算器", desc: "在线房贷计算", url: "https://www.fangdaijisuanqi.com" },
-                { title: "V2EX", desc: "创意工作者社区", url: "https://www.v2ex.com" },
-                { title: "M3U8播放器", desc: "在线视频播放测试", url: "https://m3u8-player.com" }
-            ]
-        },
-        {
-            id: 'ai', name: 'AI 服务', icon: '<path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>',
-            items: [
-                { title: "ChatGPT", desc: "OpenAI 聊天机器人", url: "https://chat.openai.com" },
-                { title: "Claude", desc: "Anthropic AI", url: "https://claropic.ai" },
-                { title: "文心一言", desc: "百度AI助手", url: "https://yiyan.baidu.com" }
-            ]
-        },
-        {
-            id: 'bio', name: '生物信息', icon: '<path d="M2 12h5"/><path d="M17 12h5"/><path d="M7 12v-1.5a2.5 2.5 0 0 1 5 0"/><path d="M12 10.5v3a2.5 2.5 0 0 0 5 0V12"/>',
-            items: [
-                { title: "NCBI", desc: "生物技术信息中心", url: "https://www.ncbi.nlm.nih.gov" },
-                { title: "Bioconda", desc: "生物信息软件包", url: "https://bioconda.github.io" },
-                { title: "R Project", desc: "R 语言官网", url: "https://www.r-project.org" }
-            ]
-        },
-        {
-            id: 'office', name: '科研办公', icon: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/>',
-            items: [
-                { title: "Google Scholar", desc: "谷歌学术", url: "https://scholar.google.com" }
-            ]
-        },
-        {
-            id: 'leisure', name: '悠闲娱乐', icon: '<polygon points="5 3 19 12 5 21 5 3"/>',
-            items: []
-        },
-        {
-            id: 'assets', name: '素材资源', icon: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
-            items: []
-        }
-    ],
-
-    activeId: 'tools',
-
-    // 初始化方法
-    init: () => {
-        const container = document.getElementById('friends-container');
-        if(!container) return;
-
-        container.classList.remove('hidden');
-        Friends.activeId = Friends.data[0].id;
-        Friends.render();
+window.FriendsData = [
+    {
+        id: 'tools',
+        name: '常用工具',
+        icon: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+        items: [
+            { title: '语雀', desc: '专业的云端知识库', url: 'https://www.yuque.com' },
+            { title: 'QQ邮箱', desc: '腾讯QQ邮箱服务', url: 'https://mail.qq.com' },
+            { title: 'GitHub', desc: '代码托管平台', url: 'https://github.com' },
+            { title: '在线PS', desc: '网页版PhotoShop', url: 'https://ps.gaoding.com' },
+            { title: 'Bilibili', desc: '干杯~', url: 'https://www.bilibili.com', icon_bg: 'bg-pink-100' },
+            { title: '知乎', desc: '有问题就会有答案', url: 'https://www.zhihu.com' },
+            { title: '开源中国', desc: '技术交流社区', url: 'https://www.oschina.net' },
+            { title: '房贷计算器', desc: '在线房贷计算', url: 'https://www.fangdaijisuanqi.com' },
+            { title: 'V2EX', desc: '创意工作者社区', url: 'https://www.v2ex.com' },
+            { title: 'M3U8播放器', desc: '在线视频播放测试', url: 'https://m3u8-player.com' }
+        ]
     },
-
-    // 获取随机徽章颜色
-    getRandomBadgeColor: () => {
-        const colors = [
-            'bg-rose-100 text-rose-600 border-rose-200',
-            'bg-blue-100 text-blue-600 border-blue-200',
-            'bg-green-100 text-green-600 border-green-200',
-            'bg-amber-100 text-amber-600 border-amber-200',
-            'bg-purple-100 text-purple-600 border-purple-200'
-        ];
-        return colors[Math.floor(Math.random() * colors.length)];
+    {
+        id: 'ai',
+        name: 'AI 服务',
+        icon: '<path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>',
+        items: [
+            { title: 'ChatGPT', desc: 'OpenAI 聊天机器人', url: 'https://chat.openai.com' },
+            { title: 'Claude', desc: 'Anthropic AI', url: 'https://claude.ai' },
+            { title: '文心一言', desc: '百度AI助手', url: 'https://yiyan.baidu.com' }
+        ]
     },
-
-    // 切换分类
-    switchCat: (id) => {
-        Friends.activeId = id;
-        Friends.render();
+    {
+        id: 'bio',
+        name: '生物信息',
+        icon: '<path d="M2 12h5"/><path d="M17 12h5"/><path d="M7 12v-1.5a2.5 2.5 0 0 1 5 0"/><path d="M12 10.5v3a2.5 2.5 0 0 0 5 0V12"/>',
+        items: [
+            { title: 'NCBI', desc: '生物技术信息中心', url: 'https://www.ncbi.nlm.nih.gov' },
+            { title: 'Bioconda', desc: '生物信息软件包', url: 'https://bioconda.github.io' },
+            { title: 'R Project', desc: 'R 语言官网', url: 'https://www.r-project.org' }
+        ]
     },
-
-    // 渲染界面
-    render: () => {
-        const sidebar = document.getElementById('friends-sidebar');
-        const content = document.getElementById('friends-content');
-        
-        if (!sidebar || !content) return;
-
-        // 渲染侧边栏
-        sidebar.innerHTML = `
-            <!-- 笔记本线圈装饰 (金属活页 O型线圈) -->
-            <div class="hidden md:flex flex-col justify-between absolute -right-[14px] top-10 bottom-10 pointer-events-none z-30 h-[85%]">
-                 <!-- 线圈 1 -->
-                 <div class="relative">
-                    <div class="w-3 h-3 rounded-full bg-slate-800 absolute -left-1 top-0.5 z-0"></div> <!-- 穿孔孔洞 -->
-                    <div class="w-9 h-2.5 rounded-full bg-gradient-to-r from-neutral-600 via-neutral-300 to-neutral-500 ring-1 ring-neutral-700 shadow-[2px_2px_3px_rgba(0,0,0,0.4)] transform -rotate-12 origin-left relative z-10"></div>
-                 </div>
-                 <!-- 线圈 2 -->
-                 <div class="relative">
-                    <div class="w-3 h-3 rounded-full bg-slate-800 absolute -left-1 top-0.5 z-0"></div>
-                    <div class="w-9 h-2.5 rounded-full bg-gradient-to-r from-neutral-600 via-neutral-300 to-neutral-500 ring-1 ring-neutral-700 shadow-[2px_2px_3px_rgba(0,0,0,0.4)] transform -rotate-12 origin-left relative z-10"></div>
-                 </div>
-                 <!-- 线圈 3 -->
-                 <div class="relative">
-                    <div class="w-3 h-3 rounded-full bg-slate-800 absolute -left-1 top-0.5 z-0"></div>
-                    <div class="w-9 h-2.5 rounded-full bg-gradient-to-r from-neutral-600 via-neutral-300 to-neutral-500 ring-1 ring-neutral-700 shadow-[2px_2px_3px_rgba(0,0,0,0.4)] transform -rotate-12 origin-left relative z-10"></div>
-                 </div>
-                 <!-- 线圈 4 -->
-                 <div class="relative">
-                    <div class="w-3 h-3 rounded-full bg-slate-800 absolute -left-1 top-0.5 z-0"></div>
-                    <div class="w-9 h-2.5 rounded-full bg-gradient-to-r from-neutral-600 via-neutral-300 to-neutral-500 ring-1 ring-neutral-700 shadow-[2px_2px_3px_rgba(0,0,0,0.4)] transform -rotate-12 origin-left relative z-10"></div>
-                 </div>
-                 <!-- 线圈 5 -->
-                 <div class="relative">
-                    <div class="w-3 h-3 rounded-full bg-slate-800 absolute -left-1 top-0.5 z-0"></div>
-                    <div class="w-9 h-2.5 rounded-full bg-gradient-to-r from-neutral-600 via-neutral-300 to-neutral-500 ring-1 ring-neutral-700 shadow-[2px_2px_3px_rgba(0,0,0,0.4)] transform -rotate-12 origin-left relative z-10"></div>
-                 </div>
-                 <!-- 线圈 6 -->
-                 <div class="relative">
-                    <div class="w-3 h-3 rounded-full bg-slate-800 absolute -left-1 top-0.5 z-0"></div>
-                    <div class="w-9 h-2.5 rounded-full bg-gradient-to-r from-neutral-600 via-neutral-300 to-neutral-500 ring-1 ring-neutral-700 shadow-[2px_2px_3px_rgba(0,0,0,0.4)] transform -rotate-12 origin-left relative z-10"></div>
-                 </div>
-                 <!-- 线圈 7 -->
-                 <div class="relative">
-                    <div class="w-3 h-3 rounded-full bg-slate-800 absolute -left-1 top-0.5 z-0"></div>
-                    <div class="w-9 h-2.5 rounded-full bg-gradient-to-r from-neutral-600 via-neutral-300 to-neutral-500 ring-1 ring-neutral-700 shadow-[2px_2px_3px_rgba(0,0,0,0.4)] transform -rotate-12 origin-left relative z-10"></div>
-                 </div>
-            </div>
-            <h2 class="text-xs font-bold text-slate-400 uppercase mb-4 px-4">分类</h2>
-            <div class="space-y-1">
-                ${Friends.data.map(cat => `
-                    <button onclick="Friends.switchCat('${cat.id}')" class="w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${Friends.activeId === cat.id ? 'bg-white text-rose-600 shadow-sm border border-slate-100' : 'text-slate-500 hover:bg-white/60'}">
-                        <div class="flex items-center gap-2">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${cat.icon}</svg>
-                            ${cat.name}
-                        </div>
-                    </button>
-                `).join('')}
-            </div>
-        `;
-
-        // 渲染内容区
-        const activeCat = Friends.data.find(c => c.id === Friends.activeId);
-        if (!activeCat) return;
-
-        const badgeColor = Friends.getRandomBadgeColor();
-        
-        content.innerHTML = `
-            <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2 flex-wrap">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${activeCat.icon}</svg>
-                ${activeCat.name}
-                <span class="text-xs font-bold ml-2 px-2.5 py-1 rounded-full border ${badgeColor}">共收录 ${activeCat.items.length} 个优质资源</span>
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                ${activeCat.items.length > 0 ? activeCat.items.map(item => {
-                    // 卡片整体背景色（默认白色）
-                    const cardBgClass = item.color || 'bg-white border-slate-200 hover:border-rose-200';
-                    
-                    // 图标容器背景色（默认灰色 bg-slate-50）
-                    const iconBgClass = item.icon_bg || 'bg-slate-50';
-
-                    // 图标内容处理
-                    let iconContent = '';
-                    if (item.icon) {
-                        if (item.icon.trim().startsWith('<')) {
-                            // 如果是 HTML 标签（如 <svg> 或 <img>），直接使用
-                            iconContent = item.icon;
-                        } else {
-                            // 如果是 URL，包装成 img 标签
-                            iconContent = `<img src="${item.icon}" class="w-6 h-6 object-contain relative z-10" alt="${item.title}"/>`;
-                        }
-                    } else {
-                        // 自动获取 Favicon
-                        let hostname = 'localhost';
-                        try { hostname = new URL(item.url).hostname; } catch(e) {}
-                        iconContent = `<img src="https://www.google.com/s2/favicons?domain=${hostname}&sz=64" class="w-6 h-6 object-contain relative z-10" onerror="this.style.display='none'"/>`;
-                    }
-
-                    return `
-                    <a href="${item.url}" target="_blank" class="${cardBgClass} border p-4 rounded-xl hover:shadow-md transition-all flex items-center gap-3 group hover:-translate-y-1">
-                        <div class="w-10 h-10 rounded-lg ${iconBgClass} border border-slate-100 flex items-center justify-center overflow-hidden shrink-0 relative">
-                            ${iconContent}
-                            <div class="absolute inset-0 flex items-center justify中心 z-0 text-slate-300">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"/></svg>
-                            </div>
-                        </div>
-                        <div class="overflow-hidden flex-1">
-                            <div class="font-bold text-slate-800 text-sm truncate group-hover:text-rose-600 transition-colors">${item.title}</div>
-                            <div class="text-xs text-slate-500 truncate mt-0.5">${item.desc}</div>
-                        </div>
-                    </a>
-                `}).join('') : `
-                    <div class="col-span-full flex flex-col items-center justify-center py-12 text-slate-400 opacity-60">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                        <p class="mt-2 text-sm">暂无内容</p>
-                    </div>
-                `}
-            </div>
-        `;
+    {
+        id: 'office',
+        name: '科研办公',
+        icon: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/>',
+        items: [
+            { title: 'Google Scholar', desc: '谷歌学术', url: 'https://scholar.google.com' }
+        ]
+    },
+    {
+        id: 'leisure',
+        name: '悠闲娱乐',
+        icon: '<polygon points="5 3 19 12 5 21 5 3"/>',
+        items: []
+    },
+    {
+        id: 'assets',
+        name: '素材资源',
+        icon: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
+        items: []
     }
-};
-
-// 确保全局访问，以便内联事件（onclick）可以调用
-window.Friends = Friends;
+];

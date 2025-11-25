@@ -33,7 +33,7 @@ const App = {
         // 4. 页面特定逻辑检测
         if (document.getElementById('quote-text')) App.initHome();
         if (document.getElementById('about-typewriter')) App.initAbout();
-        if (document.getElementById('friends-container')) App.initFriends();
+        if (document.getElementById('friends-container')) App.renderFriendsPage();
 
         // 🛡️ 安全防御：全站禁止右键菜单
         document.addEventListener('contextmenu', event => event.preventDefault());
@@ -150,14 +150,14 @@ const App = {
                     <span id="uptime-seconds" class="text-slate-800 font-bold w-[20px] text-center">00</span><span class="text-slate-500 text-xs">秒</span>
                 </div>
 
-                <div class="flex flex-wrap justify中心 gap-1 px-4">
-                    ${App.createBadge('Frame', 'H5', 'blue', 'code')}
-                    ${App.createBadge('Hosted', 'Oracle', 'green', 'server', 'https://www.oracle.com')}
-                    ${App.createBadge('萌ICP备', '2020520', 'pink', 'icp')}
-                    ${App.createBadge('Source', 'Github', 'purple', 'src', 'https://github.com')}
+                <div class="flex flex-wrap justify-center gap-1 px-4">
+                    ${App.createBadge('Frame', 'H5', 'blue', 'code', null, '本站框架为H5')}
+                    ${App.createBadge('Hosted', 'Oracle', 'green', 'server', 'https://www.oracle.com', '本站采用多线部署，主线路托管於甲骨文雲')}
+                    ${App.createBadge('萌ICP备', '2020520', 'pink', 'icp', null, '本站已经获得豪华备案套餐')}
+                    ${App.createBadge('Source', 'Github', 'purple', 'src', 'https://github.com', '本项目由GitHub托管')}
                 </div>
 
-                <div class="flex items-center justify中心 gap-2 text-sm text-slate-400 font-light mt-1">
+                <div class="flex items-center justify-center gap-2 text-sm text-slate-400 font-light mt-1">
                     <span>Copyright &copy; 2023 - ${year}</span>
                     <span class="text-red-500 text-base animate-heart-flash">♥</span>
                     <span class="font-medium text-slate-500">捌玖 All Rights Reserved.</span>
@@ -167,7 +167,7 @@ const App = {
         document.body.insertAdjacentHTML('beforeend', footerHTML);
     },
 
-    createBadge: (left, right, color, iconType, href = null) => {
+    createBadge: (left, right, color, iconType, href = null, tooltipText = null) => {
         const colors = { blue: 'bg-[#3b8eea]', green: 'bg-[#42b983]', pink: 'bg-[#ff69b4]', purple: 'bg-[#8e44ad]', red: 'bg-[#e05d44]' };
         const bgClass = colors[color] || 'bg-slate-500';
         
@@ -188,8 +188,14 @@ const App = {
         let viewBox = '0 0 24 24', strokeWidth = '2', stroke = 'currentColor', fill = 'none';
         
         const iconSvg = hasIcon ? `<svg viewBox="${viewBox}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="${iconClass}">${icons[iconType]}</svg>` : '';
-        const content = `<div class="flex items-center shadow-sm text-[10px] rounded-[3px] overflow-hidden cursor-default select-none hover:opacity-90 transition-opacity"><div class="flex items-center gap-1 bg-[#555555] text-white px-1.5 py-[2px] font-medium" style="color:#fff">${iconSvg}<span>${left}</span></div><div class="${bgClass} text-white px-1.5 py-[2px] font-medium" style="color:#fff">${right}</div></div>`;
-        if (href) return `<a href="${href}" target="_blank">${content}</a>`;
+        
+        // 准备 Tooltip 属性
+        const tooltipAttr = tooltipText ? ` data-tooltip="${tooltipText}"` : '';
+
+        // 强制文字白色 style="color:#fff"
+        const content = `<div class="flex items-center shadow-sm text-[10px] rounded-[3px] overflow-hidden cursor-default select-none hover:opacity-90 transition-opacity" ${!href ? tooltipAttr : ''}><div class="flex items-center gap-1 bg-[#555555] text-white px-1.5 py-[2px] font-medium" style="color:#fff">${iconSvg}<span>${left}</span></div><div class="${bgClass} text-white px-1.5 py-[2px] font-medium" style="color:#fff">${right}</div></div>`;
+        
+        if (href) return `<a href="${href}" target="_blank"${tooltipAttr}>${content}</a>`;
         return content;
     },
 
@@ -423,16 +429,14 @@ const App = {
             type();
         }
 
-        // 绑定弹窗事件
-        window.toggleWechatModal = App.toggleWechatModal;
-        window.toggleCoffeeModal = App.toggleCoffeeModal;
+        // 绑定弹窗事件（统一调用通用方法）
     },
 
-    toggleWechatModal: () => {
-        const modal = document.getElementById('wechat-modal');
+    toggleModal: (id) => {
+        const modal = document.getElementById(id);
         if (!modal) return;
         const content = modal.firstElementChild;
-        
+
         if (modal.classList.contains('hidden')) {
             modal.classList.remove('hidden');
             setTimeout(() => {
@@ -450,38 +454,134 @@ const App = {
         }
     },
 
-    toggleCoffeeModal: () => {
-        const modal = document.getElementById('coffee-modal');
-        if (!modal) return;
-        const content = modal.firstElementChild;
-        
-        if (modal.classList.contains('hidden')) {
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                content.classList.remove('scale-95');
-                content.classList.add('scale-100');
-            }, 10);
-        } else {
-            modal.classList.add('opacity-0');
-            content.classList.remove('scale-100');
-            content.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
+    // ================== 友链页面渲染 ==================
+    renderFriendsPage: () => {
+        if (!Array.isArray(window.FriendsData)) return;
+
+        const container = document.getElementById('friends-container');
+        const sidebar = document.getElementById('friends-sidebar');
+        const content = document.getElementById('friends-content');
+        if (!container || !sidebar || !content) return;
+
+        container.classList.remove('hidden');
+        App.friendsState.activeId = window.FriendsData[0]?.id || '';
+        App.renderFriendsSidebar();
+        App.renderFriendsContent();
+    },
+
+    friendsState: {
+        activeId: '',
+        get activeCategory() {
+            return window.FriendsData.find(cat => cat.id === App.friendsState.activeId);
         }
     },
 
-    // ================== 友链页面渲染 (新) ==================
-    // 逻辑已迁移至 js/friends.js，通过 App.initFriends() 统一调用
-    initFriends: () => {
-        if (typeof Friends !== 'undefined' && Friends.init) {
-            Friends.init();
+    renderFriendsSidebar: () => {
+        const sidebar = document.getElementById('friends-sidebar');
+        if (!sidebar) return;
+
+        let coilsHTML = '';
+        for (let i = 0; i < 6; i++) {
+            coilsHTML += `
+                <div class="relative">
+                    <div class="w-3 h-3 rounded-full bg-slate-800 absolute -left-1 top-0.5 z-0"></div>
+                    <div class="w-8 h-2.5 rounded-full bg-gradient-to-b from-zinc-600 via-zinc-500 to-zinc-700 ring-1 ring-zinc-800 shadow-[1px_1px_2px_rgba(0,0,0,0.3)] transform -rotate-12 origin-left relative z-10"></div>
+                </div>`;
         }
+
+        sidebar.innerHTML = `
+            <div class="hidden md:flex flex-col justify-between absolute -right-[16px] top-8 bottom-8 pointer-events-none z-30 h-[80%]">
+                ${coilsHTML}
+            </div>
+            <h2 class="text-xs font-bold text-slate-400 uppercase mb-4 px-4">分类</h2>
+            <div class="space-y-1">
+                ${window.FriendsData.map(cat => `
+                    <button onclick="App.switchFriendsCategory('${cat.id}')" class="w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${App.friendsState.activeId === cat.id ? 'bg-white text-rose-600 shadow-sm border border-slate-100' : 'text-slate-500 hover:bg-white/60'}">
+                        <div class="flex items-center gap-2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${cat.icon}</svg>
+                            ${cat.name}
+                        </div>
+                    </button>
+                `).join('')}
+            </div>
+        `;
+    },
+
+    switchFriendsCategory: (id) => {
+        App.friendsState.activeId = id;
+        App.renderFriendsSidebar();
+        App.renderFriendsContent();
+    },
+
+    renderFriendsContent: () => {
+        const content = document.getElementById('friends-content');
+        if (!content) return;
+
+        const activeCat = App.friendsState.activeCategory;
+        if (!activeCat) return;
+
+        const badgeColor = App.getRandomBadgeColor();
+
+        content.innerHTML = `
+            <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2 flex-wrap">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${activeCat.icon}</svg>
+                ${activeCat.name}
+                <span class="text-xs font-bold ml-2 px-2.5 py-1 rounded-full border ${badgeColor}">共收录 ${activeCat.items.length} 个优质资源</span>
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                ${activeCat.items.length > 0 ? activeCat.items.map(App.renderFriendsCard).join('') : App.renderFriendsEmpty()}
+            </div>
+        `;
+    },
+
+    renderFriendsCard: (item) => {
+        const cardBgClass = item.color || 'bg-white border-slate-200 hover:border-rose-200';
+        const iconBgClass = item.icon_bg || 'bg-slate-50';
+
+        let iconContent = '';
+        if (item.icon) {
+            iconContent = item.icon.trim().startsWith('<') ? item.icon : `<img src="${item.icon}" class="w-6 h-6 object-contain relatif z-10" alt="${item.title}"/>`;
+        } else {
+            let hostname = 'localhost';
+            try { hostname = new URL(item.url).hostname; } catch(e) {}
+            iconContent = `<img src="https://www.google.com/s2/favicons?domain=${hostname}&sz=64" class="w-6 h-6 object-contain relative z-10" onerror="this.style.display='none'"/>`;
+        }
+
+        return `
+            <a href="${item.url}" target="_blank" class="${cardBgClass} border p-4 rounded-xl hover:shadow-md transition-all flex items-center gap-3 group hover:-translate-y-1">
+                <div class="w-10 h-10 rounded-lg ${iconBgClass} border border-slate-100 flex items-center justify-center overflow-hidden shrink-0 relative">
+                    ${iconContent}
+                    <div class="absolute inset-0 flex items-center justify中心 z-0 text-slate-300">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"/></svg>
+                    </div>
+                </div>
+                <div class="overflow-hidden flex-1">
+                    <div class="font-bold text-slate-800 text-sm truncate group-hover:text-rose-600 transition-colors">${item.title}</div>
+                    <div class="text-xs text-slate-500 truncate mt-0.5">${item.desc}</div>
+                </div>
+            </a>`;
+    },
+
+    renderFriendsEmpty: () => `
+        <div class="col-span-full flex flex-col items-center justify-center py-12 text-slate-400 opacity-60">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p class="mt-2 text-sm">暂无内容</p>
+        </div>
+    `,
+
+    getRandomBadgeColor: () => {
+        const colors = [
+            'bg-rose-100 text-rose-600 border-rose-200',
+            'bg-blue-100 text-blue-600 border-blue-200',
+            'bg-green-100 text-green-600 border-green-200',
+            'bg-amber-100 text-amber-600 border-amber-200',
+            'bg-purple-100 text-purple-600 border-purple-200'
+        ];
+        return colors[Math.floor(Math.random() * colors.length)];
     }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    try { console.log("App initializing..."); App.init(); } 
+    try { App.init(); }
     catch (e) { console.error("App initialization failed:", e); }
 });
