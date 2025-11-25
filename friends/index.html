@@ -3,169 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>捌玖导航 - 友链</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="../css/style.css?v=final_14">
+    <title>我爱你捌玖 | 友链 - 遇见有趣的灵魂</title>
+    <meta name="description" content="我爱你捌玖 (52089.cn) 精选友情链接。链接那些有趣的灵魂，收录优质的情感博客与实用工具，让我们在互联网的海洋中彼此相连。">
+    <meta name="keywords" content="我爱你捌玖, 52089.cn, 友链, 友情链接, 博客导航, 情感网站">
+    <meta name="author" content="我爱你捌玖">
+    <link rel="canonical" href="https://52089.cn/friends/">
+    <link rel="shortcut icon" href="../img/favicon.ico" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="../CSS/style.css">
 </head>
 <body>
     <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-blue-100/40 via-slate-50 to-rose-50/40 z-0 pointer-events-none"></div>
-    
-    <!-- 占位符：Main.js 会自动填充 Header -->
-
     <main class="relative z-10 flex-grow flex flex-col items-center justify-center w-full pt-24 pb-10 px-4">
         <div id="friends-container" class="glass-card w-full max-w-6xl rounded-3xl overflow-hidden flex flex-col md:flex-row min-h-[500px] animate-fade-in hidden">
-            <!-- Sidebar (动态生成) -->
-            <div id="friends-sidebar" class="w-full md:w-64 bg-slate-50 border-r border-slate-200 p-4"></div>
-            <!-- Content (动态生成) -->
-            <div id="friends-content" class="flex-1 p-6 bg-white/40 overflow-y-auto max-h-[800px]"></div>
+            <div id="friends-sidebar" class="w-full md:w-64 bg-slate-50 border-r border-slate-200 p-4 relative"></div>
+            <div id="friends-content" class="flex-1 p-6 bg-white/40 overflow-y-auto max-h-[800px] scrollbar-hide"></div>
         </div>
     </main>
-
-    <!-- 数据配置 -->
-    <script>
-        // === 友链数据配置区 (在此添加新网站) ===
-        const friendsData = [
-            {
-                id: 'tools', name: '常用工具', icon: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
-                items: [
-                    { title: "语雀", desc: "专业的云端知识库", url: "https://www.yuque.com" },
-                    { title: "QQ邮箱", desc: "腾讯QQ邮箱服务", url: "https://mail.qq.com" },
-                    { title: "GitHub", desc: "代码托管平台", url: "https://github.com" },
-                    { title: "在线PS", desc: "网页版PhotoShop", url: "https://ps.gaoding.com" },
-                    { title: "Bilibili", desc: "干杯~", url: "https://www.bilibili.com" },
-                    { title: "知乎", desc: "有问题就会有答案", url: "https://www.zhihu.com" },
-                    { title: "开源中国", desc: "技术交流社区", url: "https://www.oschina.net" },
-                    { title: "房贷计算器", desc: "在线房贷计算", url: "https://www.fangdaijisuanqi.com" },
-                    { title: "V2EX", desc: "创意工作者社区", url: "https://www.v2ex.com" },
-                    { title: "M3U8播放器", desc: "在线视频播放测试", url: "https://m3u8-player.com" }
-                ]
-            },
-            {
-                id: 'ai', name: 'AI 服务', icon: '<path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>',
-                items: [
-                    { title: "ChatGPT", desc: "OpenAI 聊天机器人", url: "https://chat.openai.com" },
-                    { title: "Claude", desc: "Anthropic AI", url: "https://claude.ai" },
-                    { title: "文心一言", desc: "百度AI助手", url: "https://yiyan.baidu.com" }
-                ]
-            },
-            {
-                id: 'bio', name: '生物信息', icon: '<path d="M2 12h5"/><path d="M17 12h5"/><path d="M7 12v-1.5a2.5 2.5 0 0 1 5 0"/><path d="M12 10.5v3a2.5 2.5 0 0 0 5 0V12"/>',
-                items: [
-                    { title: "NCBI", desc: "生物技术信息中心", url: "https://www.ncbi.nlm.nih.gov" },
-                    { title: "Bioconda", desc: "生物信息软件包", url: "https://bioconda.github.io" },
-                    { title: "R Project", desc: "R 语言官网", url: "https://www.r-project.org" }
-                ]
-            },
-            {
-                id: 'office', name: '科研办公', icon: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/>',
-                items: [
-                    { title: "Google Scholar", desc: "谷歌学术", url: "https://scholar.google.com" }
-                ]
-            },
-            {
-                id: 'leisure', name: '悠闲娱乐', icon: '<polygon points="5 3 19 12 5 21 5 3"/>',
-                items: []
-            },
-            {
-                id: 'assets', name: '素材资源', icon: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
-                items: []
-            }
-        ];
-
-        // 页面渲染逻辑
-        document.addEventListener('DOMContentLoaded', () => {
-            const container = document.getElementById('friends-container');
-            const sidebar = document.getElementById('friends-sidebar');
-            const content = document.getElementById('friends-content');
-            if(!container) return;
-
-            container.classList.remove('hidden');
-            let activeId = friendsData[0].id;
-
-            // 随机颜色生成器
-            const getRandomBadgeColor = () => {
-                const colors = [
-                    'bg-rose-100 text-rose-600 border-rose-200',
-                    'bg-blue-100 text-blue-600 border-blue-200',
-                    'bg-green-100 text-green-600 border-green-200',
-                    'bg-amber-100 text-amber-600 border-amber-200',
-                    'bg-purple-100 text-purple-600 border-purple-200',
-                    'bg-indigo-100 text-indigo-600 border-indigo-200',
-                    'bg-cyan-100 text-cyan-600 border-cyan-200',
-                    'bg-teal-100 text-teal-600 border-teal-200',
-                    'bg-fuchsia-100 text-fuchsia-600 border-fuchsia-200'
-                ];
-                return colors[Math.floor(Math.random() * colors.length)];
-            };
-
-            // 渲染函数
-            const render = () => {
-                // 渲染侧边栏
-                sidebar.innerHTML = `
-                    <h2 class="text-xs font-bold text-slate-400 uppercase mb-4 px-4">分类</h2>
-                    <div class="space-y-1">
-                        ${friendsData.map(cat => `
-                            <button onclick="switchCat('${cat.id}')" class="w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${activeId === cat.id ? 'bg-white text-rose-600 shadow-sm border border-slate-100' : 'text-slate-500 hover:bg-white/60'}">
-                                <div class="flex items-center gap-2">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${cat.icon}</svg>
-                                    ${cat.name}
-                                </div>
-                            </button>
-                        `).join('')}
-                    </div>
-                `;
-
-                // 渲染内容区
-                const activeCat = friendsData.find(c => c.id === activeId);
-                // 生成随机颜色
-                const badgeColor = getRandomBadgeColor();
-                
-                content.innerHTML = `
-                    <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2 flex-wrap">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${activeCat.icon}</svg>
-                        ${activeCat.name}
-                        <span class="text-xs font-bold ml-2 px-2.5 py-1 rounded-full border ${badgeColor}">共收录 ${activeCat.items.length} 个优质资源</span>
-                    </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        ${activeCat.items.length > 0 ? activeCat.items.map(item => {
-                            // 支持自定义颜色
-                            const customClass = item.color ? item.color : 'bg-white border-slate-200 hover:border-rose-200';
-                            
-                            return `
-                            <a href="${item.url}" target="_blank" class="${customClass} border p-4 rounded-xl hover:shadow-md transition-all flex items-center gap-3 group hover:-translate-y-1">
-                                <div class="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden shrink-0 relative">
-                                    ${item.icon ? item.icon : `<img src="https://www.google.com/s2/favicons?domain=${new URL(item.url).hostname}&sz=64" class="w-6 h-6 object-contain relative z-10" onerror="this.style.display='none'"/>`}
-                                    <div class="absolute inset-0 flex items-center justify-center z-0 text-slate-300">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                                    </div>
-                                </div>
-                                <div class="overflow-hidden flex-1">
-                                    <div class="font-bold text-slate-800 text-sm truncate group-hover:text-rose-600 transition-colors">${item.title}</div>
-                                    <div class="text-xs text-slate-500 truncate mt-0.5">${item.desc}</div>
-                                </div>
-                            </a>
-                        `}).join('') : `
-                            <div class="col-span-full flex flex-col items-center justify-center py-12 text-slate-400 opacity-60">
-                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                                <p class="mt-2 text-sm">暂无内容</p>
-                            </div>
-                        `}
-                    </div>
-                `;
-            };
-
-            // 暴露给全局的切换函数
-            window.switchCat = (id) => {
-                activeId = id;
-                render();
-            };
-
-            render();
-        });
-    </script>
-
-    <!-- 脚本引入 -->
-    <script src="../js/api.js?v=final_14"></script>
-    <script src="../js/main.js?v=final_14"></script>
+    <script defer src="../JS/friends.js"></script>
+    <script defer src="../JS/api.js"></script>
+    <script defer src="../JS/main.js"></script>
 </body>
 </html>
