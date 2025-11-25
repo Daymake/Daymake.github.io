@@ -5,6 +5,7 @@
  * 2. 交互优化：全站禁止右键，图片禁止拖拽
  * 3. 营业状态：绿字/红字 + Logo切换
  * 4. 修复：强制启动时间循环，解决子页面页脚卡死问题
+ * 5. 页面逻辑整合：关于页、友链页逻辑统一管理
  */
 
 const App = {
@@ -19,19 +20,20 @@ const App = {
         App.initTooltips();
         App.initBackToTop();
         
-        //禁用图片拖拽
-document.addEventListener('dragstart', event => {
-    if (event.target.tagName === 'IMG') {
-        event.preventDefault();
-    }
-});
+        // 禁用图片拖拽
+        document.addEventListener('dragstart', event => {
+            if (event.target.tagName === 'IMG') {
+                event.preventDefault();
+            }
+        });
+
         // 3. 核心修复：无条件启动时间循环
-        // 因为所有页面都有页脚，所以必须启动，否则页脚状态会卡在 Loading
         App.startTimeLoop(); 
 
         // 4. 页面特定逻辑检测
         if (document.getElementById('quote-text')) App.initHome();
         if (document.getElementById('about-typewriter')) App.initAbout();
+        if (document.getElementById('friends-container')) App.initFriends();
 
         // 🛡️ 安全防御：全站禁止右键菜单
         document.addEventListener('contextmenu', event => event.preventDefault());
@@ -148,14 +150,14 @@ document.addEventListener('dragstart', event => {
                     <span id="uptime-seconds" class="text-slate-800 font-bold w-[20px] text-center">00</span><span class="text-slate-500 text-xs">秒</span>
                 </div>
 
-                <div class="flex flex-wrap justify-center gap-1 px-4">
+                <div class="flex flex-wrap justify中心 gap-1 px-4">
                     ${App.createBadge('Frame', 'H5', 'blue', 'code')}
                     ${App.createBadge('Hosted', 'Oracle', 'green', 'server', 'https://www.oracle.com')}
                     ${App.createBadge('萌ICP备', '2020520', 'pink', 'icp')}
                     ${App.createBadge('Source', 'Github', 'purple', 'src', 'https://github.com')}
                 </div>
 
-                <div class="flex items-center justify-center gap-2 text-sm text-slate-400 font-light mt-1">
+                <div class="flex items-center justify中心 gap-2 text-sm text-slate-400 font-light mt-1">
                     <span>Copyright &copy; 2023 - ${year}</span>
                     <span class="text-red-500 text-base animate-heart-flash">♥</span>
                     <span class="font-medium text-slate-500">捌玖 All Rights Reserved.</span>
@@ -170,9 +172,9 @@ document.addEventListener('dragstart', event => {
         const bgClass = colors[color] || 'bg-slate-500';
         
         const icons = {
-            code: `<path d="M512 70.62069h335.536552C847.501241 70.62069 847.448276 953.344 847.448276 953.344L176.498759 953.37931C176.569379 953.37931 176.551724 512 176.551724 512l-0.052965-226.392276L344.275862 70.62069H512zM298.743172 13.629793l-185.37931 238.344828A35.310345 35.310345 0 0 0 105.931034 273.655172V953.255724A70.656 70.656 0 0 0 176.498759 1024h671.002482A70.638345 70.638345 0 0 0 918.068966 953.344V70.656A70.550069 70.550069 0 0 0 847.536552 0H326.62069a35.310345 35.310345 0 0 0-27.877518 13.629793zM317.793103 247.313655C317.793103 247.207724 176.498759 247.172414 176.498759 247.172414v70.620689H317.793103c38.982621 0 70.62069-31.532138 70.62069-70.479448V70.62069h-70.62069v176.692965z m137.286621 492.402759a35.310345 35.310345 0 0 0 69.08469 14.689103l62.411034-293.570207a35.310345 35.310345 0 0 0-69.084689-14.689103l-62.411035 293.570207z m276.462345-117.142069a26.182621 26.182621 0 0 1 0-37.040552l-103.282759 103.265104a35.310345 35.310345 0 0 0 49.964138 49.928827l103.247449-103.247448a44.438069 44.438069 0 0 0 0-62.852414l-103.265104-103.247448a35.310345 35.310345 0 0 0-49.928827 49.928827l103.265103 103.282759z m-471.357793-49.928828a44.438069 44.438069 0 0 0 0 62.834759l103.265103 103.247448a35.310345 35.310345 0 0 0 49.928828-49.928827l-103.265104-103.265104c10.24 10.24 10.24 26.800552 0 37.040552l103.282759-103.265104a35.310345 35.310345 0 0 0-49.964138-49.928827l-103.247448 103.265103z"/>`,
+            code: '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
             server: '<rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>',
-            icp: `<path d="M525.277867 4.983467c42.8032 36.522667 187.050667 144.1792 410.0096 150.391466 11.264 0.4096 20.411733 9.557333 20.411733 20.957867V605.525333C955.6992 797.627733 669.934933 1024 511.965867 1024 349.4912 1024 68.232533 797.627733 68.232533 605.525333V176.3328c0-11.605333 9.147733-20.6848 20.411734-20.957867C311.671467 149.230933 455.918933 41.642667 498.653867 4.983467a20.2752 20.2752 0 0 1 26.624 0z" fill="#FFF2F2"/><path d="M525.277867 4.983467c42.8032 36.522667 187.050667 144.1792 410.0096 150.391466 11.264 0.4096 20.411733 9.557333 20.411733 20.957867V605.525333C955.6992 797.627733 669.934933 1024 511.965867 1024 349.4912 1024 68.232533 797.627733 68.232533 605.525333V176.3328c0-11.605333 9.147733-20.6848 20.411734-20.957867C311.671467 149.230933 455.918933 41.642667 498.653867 4.983467a20.2752 20.2752 0 0 1 26.624 0zM511.965867 88.064l-10.922667 8.123733c-92.023467 65.536-212.3776 115.9168-358.126933 129.160534l-0.682667 380.1088c0 134.280533 220.637867 334.165333 358.4 344.8832l11.332267 0.477866c133.7344 0 369.800533-208.6912 369.800533-345.429333V225.4848h-0.887467c-145.408-13.175467-265.079467-63.214933-357.512533-128.955733L511.965867 88.132267z" fill="#FF7E7E"/><path d="M340.2752 315.5968l96.8704-14.609067a19.387733 19.387733 0 0 0 14.404267-10.8544l43.349333-90.999466a18.8416 18.8416 0 0 1 34.338133 0l43.349334 90.999466c2.730667 5.802667 8.192 9.898667 14.404266 10.922667l96.938667 14.5408c15.701333 2.321067 21.845333 22.3232 10.581333 33.792L624.401067 420.181333a20.206933 20.206933 0 0 0-5.461334 17.544534l16.5888 100.010666c2.730667 16.1792-13.653333 28.535467-27.784533 20.8896l-86.6304-47.172266a18.158933 18.158933 0 0 0-17.749333 0l-86.8352 47.104c-14.062933 7.714133-30.378667-4.642133-27.784534-20.821334l16.5888-100.010666a20.206933 20.206933 0 0 0-5.461333-17.544534L329.8304 349.3888c-11.4688-11.4688-5.12-31.470933 10.4448-33.792z m362.496 416.426667a18.978133 18.978133 0 0 1-18.6368 19.319466H339.797333a18.978133 18.978133 0 0 1-18.705066-19.387733v-48.264533c0-10.717867 8.328533-19.387733 18.705066-19.387734h344.337067c10.376533 0 18.705067 8.669867 18.705067 19.387734v48.264533z" fill="#FF4545"/>`,
+            icp: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
             src: '<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>'
         };
         
@@ -184,10 +186,9 @@ document.addEventListener('dragstart', event => {
         else if (iconType === 'src') iconClass += ' animate-src-flash';
 
         let viewBox = '0 0 24 24', strokeWidth = '2', stroke = 'currentColor', fill = 'none';
-        if (iconType === 'code' || iconType === 'icp') { viewBox = '0 0 1024 1024'; strokeWidth = '0'; stroke = 'none'; fill = 'currentColor'; }
         
         const iconSvg = hasIcon ? `<svg viewBox="${viewBox}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="${iconClass}">${icons[iconType]}</svg>` : '';
-        const content = `<div class="flex items-center shadow-sm text-[10px] rounded-[3px] overflow-hidden cursor-default select-none hover:opacity-90 transition-opacity"><div class="flex items-center gap-1 bg-[#555555] text-white px-1.5 py-[2px] font-medium">${iconSvg}<span>${left}</span></div><div class="${bgClass} text-white px-1.5 py-[2px] font-medium">${right}</div></div>`;
+        const content = `<div class="flex items-center shadow-sm text-[10px] rounded-[3px] overflow-hidden cursor-default select-none hover:opacity-90 transition-opacity"><div class="flex items-center gap-1 bg-[#555555] text-white px-1.5 py-[2px] font-medium" style="color:#fff">${iconSvg}<span>${left}</span></div><div class="${bgClass} text-white px-1.5 py-[2px] font-medium" style="color:#fff">${right}</div></div>`;
         if (href) return `<a href="${href}" target="_blank">${content}</a>`;
         return content;
     },
@@ -196,8 +197,8 @@ document.addEventListener('dragstart', event => {
         if (document.getElementById('particle-canvas')) return;
         const canvas = document.createElement('canvas');
         canvas.id = 'particle-canvas';
-        canvas.className = 'fixed top-0 left-0 w-full h-full pointer-events-none z-0 opacity-50';
-        document.body.prepend(canvas);
+        canvas.className = 'fixed top-0 left-0 w-full h-full pointer-events-none z-0 opacity-100';
+        document.body.appendChild(canvas);
         const ctx = canvas.getContext('2d');
         let particles = [];
         const resize = () => {
@@ -255,7 +256,7 @@ document.addEventListener('dragstart', event => {
                 tooltip.classList.add('visible');
                 tooltip.style.left = rect.right - 10 + 'px';
                 tooltip.style.top = rect.bottom + 5 + 'px';
-            }, 666);
+            }, 300);
         });
         document.body.addEventListener('mouseout', (e) => {
             const target = e.target.closest('[data-tooltip]');
@@ -405,19 +406,78 @@ document.addEventListener('dragstart', event => {
         loadQuote();
     },
 
+    // ================== 关于页面交互 (新) ==================
     initAbout: () => {
+        // 打字机效果
         const el = document.getElementById('about-typewriter');
-        if (!el) return;
-        const text = '有人说爱情可以让人失去生命，但我不会。我要留着这条命为你擦去嘴角的面渣；我要留着这条命去买你喜欢的玫瑰花；我要留着这条命拂去你眼角的泪水；我要留着这条命去撑起你的快乐天堂......';
-        let i = 0;
-        const type = () => {
-            if (i < text.length) {
-                el.innerText += text.charAt(i);
-                i++;
-                setTimeout(type, 80);
-            }
-        };
-        type();
+        if (el) {
+            const text = '有人说爱情可以让人失去生命，但我不会。我要留着这条命为你擦去嘴角的面渣；我要留着这条命去买你喜欢的玫瑰花；我要留着这条命拂去你眼角的泪水；我要留着这条命去撑起你的快乐天堂......';
+            let i = 0;
+            const type = () => {
+                if (i < text.length) {
+                    el.innerText += text.charAt(i);
+                    i++;
+                    setTimeout(type, 80);
+                }
+            };
+            type();
+        }
+
+        // 绑定弹窗事件
+        window.toggleWechatModal = App.toggleWechatModal;
+        window.toggleCoffeeModal = App.toggleCoffeeModal;
+    },
+
+    toggleWechatModal: () => {
+        const modal = document.getElementById('wechat-modal');
+        if (!modal) return;
+        const content = modal.firstElementChild;
+        
+        if (modal.classList.contains('hidden')) {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        } else {
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+    },
+
+    toggleCoffeeModal: () => {
+        const modal = document.getElementById('coffee-modal');
+        if (!modal) return;
+        const content = modal.firstElementChild;
+        
+        if (modal.classList.contains('hidden')) {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        } else {
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+    },
+
+    // ================== 友链页面渲染 (新) ==================
+    // 逻辑已迁移至 js/friends.js，通过 App.initFriends() 统一调用
+    initFriends: () => {
+        if (typeof Friends !== 'undefined' && Friends.init) {
+            Friends.init();
+        }
     }
 };
 
