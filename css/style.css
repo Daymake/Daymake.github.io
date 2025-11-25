@@ -150,13 +150,6 @@ img {
                 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 }
 
-/* 玻璃拟态头部 */
-.glass-header {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
-}
-
 /* 一言使用衬线字体 */
 .font-quote {
     font-family: "Noto Serif SC", serif;
@@ -223,3 +216,24 @@ header a:active {
     background-image: linear-gradient(transparent 95%, #fda4af 95%);
     background-size: 100% 2rem;
 }
+
+/* ======================================= */
+/* 6. 备用样式收纳区（暂未使用，保留以便复用） */
+/* ======================================= */
+
+/* 玻璃拟态头部（备用） */
+/* .glass-header {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+} */
+
+/* 浮动动画（备用） */
+/* .animate-float {
+    animation: float 3s ease-in-out infinite;
+} */
+
+/* 悬停旋转（备用） */
+/* .hover-spin:hover {
+    animation: spin-slow-custom 3s linear infinite;
+} */
