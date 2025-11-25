@@ -9,7 +9,7 @@
     <meta name="author" content="我爱你捌玖">
     <link rel="canonical" href="https://52089.cn/">
     <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="CSS/style.css">
 </head>
 <body>
@@ -41,7 +41,7 @@
                         <img src="img/icon-qq.png" alt="QQ" class="w-5 h-5 object-contain opacity-80 group-hover:opacity-100 transition-opacity">
                      </a>
                      
-                     <button onclick="toggleWechatModal()" title="WeChat" class="w-8 h-8 rounded-full bg-white border border-slate-100 hover:border-green-200 hover:shadow-md flex items-center justify-center transition-all group cursor-pointer">
+                     <button onclick="App.toggleModal('wechat-modal')" title="WeChat" class="w-8 h-8 rounded-full bg-white border border-slate-100 hover:border-green-200 hover:shadow-md flex items-center justify-center transition-all group cursor-pointer">
                         <img src="img/icon-wechat.png" alt="WeChat" class="w-5 h-5 object-contain opacity-80 group-hover:opacity-100 transition-opacity">
                      </button>
                      
@@ -68,7 +68,7 @@
 
                     <div class="flex justify-center">
                         <button
-                            onclick="toggleCoffeeModal()"
+                            onclick="App.toggleModal('coffee-modal')"
                             data-tooltip="請你喝咖啡☕️"
                             class="inline-flex items-center gap-2 px-10 py-2.5 rounded-full border border-rose-200 bg-white/95 shadow-lg hover:shadow-2xl text-[11px] font-medium text-rose-500 hover:bg-rose-500 hover:text-white transition-all duration-300 cursor-pointer">
                             <svg t="1763822364688" class="w-4 h-4" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5368">
